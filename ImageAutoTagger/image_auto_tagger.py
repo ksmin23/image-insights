@@ -20,7 +20,7 @@ S3_URL_FMT = 'https://{bucket_name}.s3.amazonaws.com/{object_key}'
 AWS_REGION = os.getenv('REGION_NAME', 'us-east-1')
 
 ES_INDEX, ES_TYPE = (os.getenv('ES_INDEX', 'november_photo'), os.getenv('ES_TYPE', 'photo'))
-ES_HOST = os.getenv('ES_HOST', 'vpc-november-mhnpjpog76d5aak4yxzv6zi4iy.us-east-1.es.amazonaws.com')
+ES_HOST = os.getenv('ES_HOST')
 
 session = boto3.Session(region_name=AWS_REGION)
 credentials = session.get_credentials()
@@ -94,11 +94,12 @@ def lambda_handler(event, context):
         'doc_id': hashlib.md5(image_id.encode('utf-8')).hexdigest()[:8],
         'image_id': image_id,
         'image_url': S3_URL_FMT.format(bucket_name=bucket, object_key=photo),
-        'tags': tags,
+        #'tags': tags,
+        'tags': lables,
         'tag_id': tag_id, 
         'created_at': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
       }
-      print(doc)
+      #print(doc)
 
       es_index_action_meta = {"index": {"_index": ES_INDEX, "_type": ES_TYPE, "_id": doc['doc_id']}}
       doc_list.append(es_index_action_meta)
@@ -119,7 +120,7 @@ def lambda_handler(event, context):
 if __name__ == "__main__":
     kinesis_data = [
       '''{"s3_bucket": "november-photo", "s3_key": "raw-image/20191119_170325.jpg"}''',
-      #'''{"s3_bucket": "november-photo", "s3_key": "raw-image/20191120_122332.jpg"}''',
+      '''{"s3_bucket": "november-photo", "s3_key": "raw-image/20191120_122332.jpg"}''',
     ]
 
     records = [{
@@ -140,6 +141,4 @@ if __name__ == "__main__":
       } for e in kinesis_data]
 
     event = {"Records": records}
-    import pprint
-    pprint.pprint(event)
-    #lambda_handler(event, {})
+    lambda_handler(event, {})
