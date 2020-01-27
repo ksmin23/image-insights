@@ -56,7 +56,7 @@ def lambda_handler(event, context):
 
       record = {'s3_bucket': bucket, 's3_key': key}
       print("[INFO] object created: ", record, file=sys.stderr)
-      #write_records_to_kinesis(kinesis_client, KINESIS_STREAM_NAME, [record])
+      write_records_to_kinesis(kinesis_client, KINESIS_STREAM_NAME, [record])
     except Exception as ex:
       traceback.print_exc()
 
