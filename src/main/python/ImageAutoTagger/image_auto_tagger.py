@@ -96,10 +96,10 @@ def lambda_handler(event, context):
         'image_url': S3_URL_FMT.format(bucket_name=bucket, object_key=photo),
         #'tags': tags,
         'tags': lables,
-        'tag_id': tag_id, 
+        'tag_id': tag_id,
         'created_at': datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
       }
-      #print(doc)
+      #print('[INFO]', doc)
 
       es_index_action_meta = {"index": {"_index": ES_INDEX, "_type": ES_TYPE, "_id": doc['doc_id']}}
       doc_list.append(es_index_action_meta)

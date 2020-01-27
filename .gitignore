@@ -110,4 +110,6 @@ lib64
 pyvenv.cfg
 *.bak
 share/
+cdk.out/
+cdk.context.json
 zap/
