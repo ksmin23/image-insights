@@ -1,6 +1,10 @@
 # Project
 
 - Amazon Rekognition을 활용한 이미지 자동 태킹 및 이미지 태그 데이터 시각화 서비스
+- (1) 아래와 같이 이미지를 업로드 하면,
+![demo_upload_image_files](resources/demo-upload-image-files.png)
+- (2) 다음과 같이 이미지 태그 데이터의 분석 결과를 보여준다.
+![demo_image_tags_visualization](resources/demo-image-tags-visualization.png)
 
 ### Architecture
 ![auto_image_tagger-architecture](auto_image_tagger_arch.png)
