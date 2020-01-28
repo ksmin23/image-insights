@@ -6,6 +6,7 @@
 - (2) 다음과 같이 이미지 태그 데이터의 분석 결과를 보여준다.
 ![demo_image_tags_visualization](resources/demo-image-tags-visualization.png)
 
+
 ### Architecture
 ![auto_image_tagger-architecture](auto_image_tagger_arch.png)
 
@@ -16,6 +17,30 @@
 - Elasticsearch Service
 - Rekognition
 - S3
+
+
+### RESTful API Specification
+##### Image upload
+- Request
+  - PUT
+    ```
+    - /v1/{bucket}/{object}
+    ```
+
+    | URL Path parameters | Description | Required(Yes/No) | Data Type |
+    |---------------------|-------------|------------------|-----------|
+    | bucket | s3 bucket 이름 | Yes | String |
+    | object | s3 object 이름 | Yes | String |
+
+  - ex)
+    ```
+    curl -X PUT "https://t2e7cpvqvu.execute-api.us-east-1.amazonaws.com/v1/octember-use1/bizcard-raw-img%2Fbar_s20191101_125236.jpg" \
+         --data @bar_s20191101_125236.jpg
+    ```
+
+- Response
+  - No Data
+
 
 ### How To Build & Deploy
 1. [Getting Started With the AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html)를 참고해서 cdk를 설치하고,
