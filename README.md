@@ -1,4 +1,4 @@
-# Project
+# Project Description
 
 - Amazon Rekognition을 활용한 이미지 자동 태킹 및 이미지 태그 데이터 시각화 서비스
 - (1) 아래와 같이 이미지를 업로드 하면,
