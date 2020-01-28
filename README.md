@@ -3,6 +3,7 @@
 - Amazon Rekognition을 활용한 이미지 자동 태킹 및 이미지 태그 데이터 시각화 서비스
 
 ### Architecture
+![auto_image_tagger-architecture](auto_image_tagger_arch.png)
 
 ##### Key AWS Services
 - API Gateway
