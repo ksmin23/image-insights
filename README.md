@@ -93,7 +93,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
         </CORSConfiguration>
         ```
         - ex)
-           ![octember-s3_bucket_cors_configuration](resources/octember-s3_bucket_cors_configuration.png)
+           ![s3_bucket_cors_configuration](resources/s3_bucket_cors_configuration.png)
    2. https://github.com/ksmin23/s3-direct-uploader-demo 를 로컬 PC에 git clone 한 후, 설정을 변경해줘야 할 부분을 알맞게 수정함
    3. 수정한 이후, index.html 파일을 browser로 열어서 사용함
 
