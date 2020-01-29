@@ -1,4 +1,4 @@
-# Project
+# Project Description
 
 - Amazon Rekognition을 활용한 이미지 자동 태킹 및 이미지 태그 데이터 시각화 서비스
 - (1) 아래와 같이 이미지를 업로드 하면,
@@ -34,8 +34,8 @@
 
   - ex)
     ```
-    curl -X PUT "https://t2e7cpvqvu.execute-api.us-east-1.amazonaws.com/v1/octember-use1/bizcard-raw-img%2Fbar_s20191101_125236.jpg" \
-         --data @bar_s20191101_125236.jpg
+    curl -X PUT "https://t2e7cpvqvu.execute-api.us-east-1.amazonaws.com/v1/november-photo/raw-image%2F20191101_125236.jpg" \
+         --data @20191101_125236.jpg
     ```
 
 - Response
