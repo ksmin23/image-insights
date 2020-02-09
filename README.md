@@ -1,6 +1,11 @@
-# Project
+# Project Description
 
 - Amazon Rekognition을 활용한 이미지 자동 태킹 및 이미지 태그 데이터 시각화 서비스
+- (1) 아래와 같이 이미지를 업로드 하면,
+![demo_upload_image_files](resources/demo-upload-image-files.png)
+- (2) 다음과 같이 이미지 태그 데이터의 분석 결과를 보여준다.
+![demo_image_tags_visualization](resources/demo-image-tags-visualization.png)
+
 
 ### Architecture
 ![auto_image_tagger-architecture](auto_image_tagger_arch.png)
@@ -12,6 +17,30 @@
 - Elasticsearch Service
 - Rekognition
 - S3
+
+
+### RESTful API Specification
+##### Image upload
+- Request
+  - PUT
+    ```
+    - /v1/{bucket}/{object}
+    ```
+
+    | URL Path parameters | Description | Required(Yes/No) | Data Type |
+    |---------------------|-------------|------------------|-----------|
+    | bucket | s3 bucket 이름 | Yes | String |
+    | object | s3 object 이름 | Yes | String |
+
+  - ex)
+    ```
+    curl -X PUT "https://t2e7cpvqvu.execute-api.us-east-1.amazonaws.com/v1/november-photo/raw-image%2F20191101_125236.jpg" \
+         --data @20191101_125236.jpg
+    ```
+
+- Response
+  - No Data
+
 
 ### How To Build & Deploy
 1. [Getting Started With the AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html)를 참고해서 cdk를 설치하고,
@@ -52,7 +81,29 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     (.env) $ cdk --profile cdk_user destroy
     ```
 
-### Kibana dashboards 가져오기
+5. (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 ec2 인스턴스를 생성함.
+ec2 인스턴스를 생성 할 때, (1)외부에서 ssh로 접근을 허용하는 security group과 (2)ElasticSearch cluster에 접근할 수 있는 security group으로
+ec2 인스턴스의 security group을 설정함
+
+6. (Optional) local 컴퓨터의 ssh config file에 아래 내용을 추가함 (~/.ssh/config on Mac, Linux)
+    ```shell script
+    # Elasticsearch Tunnel
+    Host estunnel
+      HostName 12.34.56.78 # your server's public IP address
+      User ec2-user # your servers' user name
+      IdentitiesOnly yes
+      IdentityFile ~/.ssh/MY-KEY.pem # your servers' key pair
+      LocalForward 9200 vpc-YOUR-ES-CLUSTER.us-east-1.es.amazonaws.com:443 # your ElasticSearch cluster endpoint
+    ```
+
+7. (Optional) local 컴퓨터에서 `ssh -N estunnel` 명렁어를 실행함
+
+8. (Optional) local 컴퓨터의 web browser (Chrome, Firefox 등)에서 아래 URL로 접속하면, ElasticSearch와 Kibana에 접근 할 수 있음
+    - Search: `https://localhost:9200/`
+    - Kibana: `https://localhost:9200/_plugin/kibana/`
+
+
+### Kibana dashboards 가져오기 (Elasticsearch version 7.1.1)
 1. Kibana toolbar에서 Management > Saved Objets 탭 선택함
 2. Import button 클릭 후에 가져올 dashboards json 파일(```resources/es-kibana/kibana-export.json```)을 선택함
 3. Dashboards 탭을 열어서 가져온 dashboard른 선택해서 dashboard를 사용하면 됨
