@@ -34,7 +34,7 @@
 
   - ex)
     ```
-    curl -X PUT "https://t2e7cpvqvu.execute-api.us-east-1.amazonaws.com/v1/november-photo/raw-image%2F20191101_125236.jpg" \
+    curl -X PUT "https://t2e7cpvqvu.execute-api.us-east-1.amazonaws.com/v1/image-vaults/raw-image%2F20191101_125236.jpg" \
          --data @20191101_125236.jpg
     ```
 
@@ -56,10 +56,10 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     ```
 
 2. Lambda Layer에 등록할 Python 패키지를 생성해서 s3 bucket에 저장함
-에를 들어, elasticsearch 패키지를 Lambda Layer에 등록 할 수 있도록 november-photo-resources라는 이름의 s3 bucket을 생성 후, 아래와 같이 저장함
+에를 들어, elasticsearch 패키지를 Lambda Layer에 등록 할 수 있도록 image-insights-resources라는 이름의 s3 bucket을 생성 후, 아래와 같이 저장함
 
     ```shell script
-    $ aws s3 ls s3://november-photo-resources/var/
+    $ aws s3 ls s3://image-insights-resources/var/
     2019-10-25 08:38:50          0
     2019-10-25 08:40:28    1294387 es-lib.zip
     ```
@@ -68,12 +68,12 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
 설정 한 후, `cdk deploy` 명령어를 이용해서 배포함
 
     ```shell script
-    $ git clone https://github.com/ksmin23/november-photo.git
-    $ cd november-photo
+    $ git clone https://github.com/ksmin23/image-insights.git
+    $ cd image-insights
     $ python3 -m venv .env
     $ source .env/bin/activate
     (.env) $ pip install -r requirements.txt
-    (.env) $ S3_BUCKET_LAMBDA_LAYER_LIB=november-photo-resources cdk --profile cdk_user deploy
+    (.env) $ S3_BUCKET_LAMBDA_LAYER_LIB=image-insights-resources cdk --profile cdk_user deploy
     ```
 
 4. 배포한 애플리케이션을 삭제하려면, `cdk destroy` 명령어를 아래와 같이 실행
