@@ -11,6 +11,6 @@ REGION = os.getenv('CDK_DEFAULT_REGION', 'us-east-1')
 AWS_ENV = core.Environment(account=ACCOUNT, region=REGION)
 
 app = core.App()
-ImageInsightsStack(app, "november-photo", env=AWS_ENV)
+ImageInsightsStack(app, "image-insights", env=AWS_ENV)
 
 app.synth()
