@@ -20,9 +20,9 @@ from aws_cdk.aws_lambda_event_sources import (
   KinesisEventSource
 )
 
-S3_BUCKET_LAMBDA_LAYER_LIB = os.getenv('S3_BUCKET_LAMBDA_LAYER_LIB', 'november-photo-resources')
+S3_BUCKET_LAMBDA_LAYER_LIB = os.getenv('S3_BUCKET_LAMBDA_LAYER_LIB', 'image-insights-resources')
 
-class NovemberPhotoStack(core.Stack):
+class ImageInsightsStack(core.Stack):
 
   def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
     super().__init__(scope, id, **kwargs)

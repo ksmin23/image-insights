@@ -6,7 +6,7 @@ with open("README.md") as fp:
 
 
 setuptools.setup(
-    name="november_photo",
+    name="image_insights",
     version="0.0.1",
 
     description="An empty CDK Python app",
@@ -15,8 +15,8 @@ setuptools.setup(
 
     author="author",
 
-    package_dir={"": "november_photo"},
-    packages=setuptools.find_packages(where="november_photo"),
+    package_dir={"": "image_insights"},
+    packages=setuptools.find_packages(where="image_insights"),
 
     install_requires=[
         "aws-cdk.core",
