@@ -96,7 +96,7 @@ ec2 인스턴스의 security group을 설정함
       LocalForward 9200 vpc-YOUR-ES-CLUSTER.us-east-1.es.amazonaws.com:443 # your ElasticSearch cluster endpoint
     ```
 
-7. (Optional) local 컴퓨터에서 `ssh -N estunnel` 명렁어를 실행함
+7. (Optional) local 컴퓨터에서 `ssh -N estunnel` 명령어를 실행함
 
 8. (Optional) local 컴퓨터의 web browser (Chrome, Firefox 등)에서 아래 URL로 접속하면, ElasticSearch와 Kibana에 접근 할 수 있음
     - Search: `https://localhost:9200/`
