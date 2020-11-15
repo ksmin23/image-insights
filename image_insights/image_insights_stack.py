@@ -20,8 +20,6 @@ from aws_cdk.aws_lambda_event_sources import (
   KinesisEventSource
 )
 
-S3_BUCKET_LAMBDA_LAYER_LIB = os.getenv('S3_BUCKET_LAMBDA_LAYER_LIB', 'image-insights-resources')
-
 class ImageInsightsStack(core.Stack):
 
   def __init__(self, scope: core.Construct, id: str, **kwargs) -> None:
@@ -54,8 +52,9 @@ class ImageInsightsStack(core.Stack):
       }
     )
 
+    s3_image_bucket_name_suffix = self.node.try_get_context('image_bucket_name_suffix')
     s3_bucket = s3.Bucket(self, "s3bucket",
-      bucket_name="image-insights-{region}-{account}".format(region=kwargs['env'].region, account=kwargs['env'].account))
+      bucket_name="image-insights-{region}-{suffix}".format(region=core.Aws.REGION, suffix=s3_image_bucket_name_suffix))
 
     api = apigw.RestApi(self, "ImageAutoTaggerUploader",
       rest_api_name="ImageAutoTaggerUploader",
@@ -344,7 +343,8 @@ class ImageInsightsStack(core.Stack):
     core.Tags.of(es_cfn_domain).add('Name', 'image-tagger-es')
 
     #XXX: https://github.com/aws/aws-cdk/issues/1342
-    s3_lib_bucket = s3.Bucket.from_bucket_name(self, id, S3_BUCKET_LAMBDA_LAYER_LIB)
+    s3_lib_bucket_name = self.node.try_get_context('lib_bucket_name')
+    s3_lib_bucket = s3.Bucket.from_bucket_name(self, id, s3_lib_bucket_name)
     es_lib_layer = _lambda.LayerVersion(self, "ESLib",
       layer_version_name="es-lib",
       compatible_runtimes=[_lambda.Runtime.PYTHON_3_7],

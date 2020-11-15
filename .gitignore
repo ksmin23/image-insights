@@ -112,4 +112,6 @@ pyvenv.cfg
 share/
 cdk.out/
 cdk.context.json
+cdk.context.json*
+
 zap/
