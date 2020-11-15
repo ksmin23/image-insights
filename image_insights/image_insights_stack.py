@@ -28,7 +28,7 @@ class ImageInsightsStack(core.Stack):
     super().__init__(scope, id, **kwargs)
 
     # The code that defines your stack goes here
-    vpc = aws_ec2.Vpc(self, "NovemberVPC",
+    vpc = aws_ec2.Vpc(self, "ImageInsightsVPC",
       max_azs=2,
 #      subnet_configuration=[{
 #          "cidrMask": 24,
@@ -55,7 +55,7 @@ class ImageInsightsStack(core.Stack):
     )
 
     s3_bucket = s3.Bucket(self, "s3bucket",
-      bucket_name="november-photo-{region}-{account}".format(region=kwargs['env'].region, account=kwargs['env'].account))
+      bucket_name="image-insights-{region}-{account}".format(region=kwargs['env'].region, account=kwargs['env'].account))
 
     api = apigw.RestApi(self, "ImageAutoTaggerUploader",
       rest_api_name="ImageAutoTaggerUploader",
@@ -283,7 +283,7 @@ class ImageInsightsStack(core.Stack):
       description='security group for elasticsearch client of image tagger',
       security_group_name='use-image-tagger-es'
     )
-    core.Tag.add(sg_use_es, 'Name', 'sg-use-image-tagger-es')
+    core.Tags.of(sg_use_es).add('Name', 'sg-use-image-tagger-es')
 
     sg_es = aws_ec2.SecurityGroup(self, "ImageTagSearchSG",
       vpc=vpc,
@@ -291,7 +291,7 @@ class ImageInsightsStack(core.Stack):
       description='security group for elasticsearch of image tag',
       security_group_name='image-tagger-es'
     )
-    core.Tag.add(sg_es, 'Name', 'sg-image-tagger-es')
+    core.Tags.of(sg_es).add('Name', 'sg-image-tagger-es')
 
     sg_es.add_ingress_rule(peer=sg_es, connection=aws_ec2.Port.all_tcp(), description='image-tagger-es')
     sg_es.add_ingress_rule(peer=sg_use_es, connection=aws_ec2.Port.all_tcp(), description='use-image-tagger-es')
@@ -311,7 +311,7 @@ class ImageInsightsStack(core.Stack):
         "volumeSize": 10,
         "volumeType": "gp2"
       },
-      domain_name="november-pictos",
+      domain_name="image-insights",
       elasticsearch_version="7.1",
       encryption_at_rest_options={
         "enabled": False
@@ -329,7 +329,7 @@ class ImageInsightsStack(core.Stack):
               "es:Get*",
               "es:ESHttp*"
             ],
-            "Resource": self.format_arn(service="es", resource="domain", resource_name="november-pictos/*")
+            "Resource": self.format_arn(service="es", resource="domain", resource_name="image-insights/*")
           }
         ]
       },
@@ -341,7 +341,7 @@ class ImageInsightsStack(core.Stack):
         "subnetIds": vpc.select_subnets(subnet_type=aws_ec2.SubnetType.PRIVATE).subnet_ids
       }
     )
-    core.Tag.add(es_cfn_domain, 'Name', 'image-tagger-es')
+    core.Tags.of(es_cfn_domain).add('Name', 'image-tagger-es')
 
     #XXX: https://github.com/aws/aws-cdk/issues/1342
     s3_lib_bucket = s3.Bucket.from_bucket_name(self, id, S3_BUCKET_LAMBDA_LAYER_LIB)
@@ -360,7 +360,7 @@ class ImageInsightsStack(core.Stack):
       code=_lambda.Code.asset("./src/main/python/ImageAutoTagger"),
       environment={
         'ES_HOST': es_cfn_domain.attr_domain_endpoint,
-        'ES_INDEX': 'november_photo',
+        'ES_INDEX': 'image_insights',
         'ES_TYPE': 'photo'
       },
       timeout=core.Duration.minutes(5),
