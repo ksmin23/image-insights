@@ -27,24 +27,25 @@ class ImageInsightsStack(core.Stack):
 
     # The code that defines your stack goes here
     vpc = aws_ec2.Vpc(self, "ImageInsightsVPC",
+      # cidr="10.0.0.0/21",
       max_azs=2,
-#      subnet_configuration=[{
-#          "cidrMask": 24,
-#          "name": "Public",
-#          "subnetType": aws_ec2.SubnetType.PUBLIC,
-#        },
-#        {
-#          "cidrMask": 24,
-#          "name": "Private",
-#          "subnetType": aws_ec2.SubnetType.PRIVATE
-#        },
-#        {
-#          "cidrMask": 28,
-#          "name": "Isolated",
-#          "subnetType": aws_ec2.SubnetType.ISOLATED,
-#          "reserved": True
-#        }
-#      ],
+      # subnet_configuration=[{
+      #     "cidrMask": 24,
+      #     "name": "Public",
+      #     "subnetType": aws_ec2.SubnetType.PUBLIC,
+      #   },
+      #   {
+      #     "cidrMask": 24,
+      #     "name": "Private",
+      #     "subnetType": aws_ec2.SubnetType.PRIVATE
+      #   },
+      #   {
+      #     "cidrMask": 28,
+      #     "name": "Isolated",
+      #     "subnetType": aws_ec2.SubnetType.ISOLATED,
+      #     "reserved": True
+      #   }
+      # ],
       gateway_endpoints={
         "S3": aws_ec2.GatewayVpcEndpointOptions(
           service=aws_ec2.GatewayVpcEndpointAwsService.S3
@@ -246,7 +247,7 @@ class ImageInsightsStack(core.Stack):
       description="Trigger to recognize an image in S3",
       code=_lambda.Code.asset("./src/main/python/TriggerImageAutoTagger"),
       environment={
-        'REGION_NAME': kwargs['env'].region,
+        'REGION_NAME': core.Aws.REGION,
         'KINESIS_STREAM_NAME': img_kinesis_stream.stream_name
       },
       timeout=core.Duration.minutes(5)
@@ -264,9 +265,10 @@ class ImageInsightsStack(core.Stack):
     ))
 
     # assign notification for the s3 event type (ex: OBJECT_CREATED)
-    s3_event_filter = s3.NotificationKeyFilter(prefix="raw-image/", suffix=".jpg")
-    s3_event_source = S3EventSource(s3_bucket, events=[s3.EventType.OBJECT_CREATED], filters=[s3_event_filter])
-    trigger_img_tagger_lambda_fn.add_event_source(s3_event_source)
+    for suffix in ('.jpeg', 'png'):
+      s3_event_filter = s3.NotificationKeyFilter(prefix="raw-image/", suffix=suffix)
+      s3_event_source = S3EventSource(s3_bucket, events=[s3.EventType.OBJECT_CREATED], filters=[s3_event_filter])
+      trigger_img_tagger_lambda_fn.add_event_source(s3_event_source)
 
     #XXX: https://github.com/aws/aws-cdk/issues/2240
     # To avoid to create extra Lambda Functions with names like LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a
@@ -275,6 +277,32 @@ class ImageInsightsStack(core.Stack):
       log_group_name="/aws/lambda/TriggerImageAutoTagger",
       retention=aws_logs.RetentionDays.THREE_DAYS)
     log_group.grant_write(trigger_img_tagger_lambda_fn)
+
+    sg_bastion_host = aws_ec2.SecurityGroup(self, "BastionHostSG",
+      vpc=vpc,
+      allow_all_outbound=True,
+      description='security group for an bastion host',
+      security_group_name='image-insights-bastion-host-sg'
+    )
+    core.Tags.of(sg_bastion_host).add('Name', 'image-insights-bastion-host-sg')
+
+    #XXX: https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_ec2/InstanceClass.html
+    #XXX: https://docs.aws.amazon.com/cdk/api/latest/python/aws_cdk.aws_ec2/InstanceSize.html#aws_cdk.aws_ec2.InstanceSize
+    ec2_instance_type = aws_ec2.InstanceType.of(aws_ec2.InstanceClass.BURSTABLE3, aws_ec2.InstanceSize.MEDIUM)
+
+    #XXX: As there are no SSH public keys deployed on this machine,
+    # you need to use EC2 Instance Connect with the command
+    #  'aws ec2-instance-connect send-ssh-public-key' to provide your SSH public key.
+    # https://aws.amazon.com/de/blogs/compute/new-using-amazon-ec2-instance-connect-for-ssh-access-to-your-ec2-instances/
+    bastion_host = aws_ec2.BastionHostLinux(self, "BastionHost",
+      vpc=vpc,
+      instance_type=ec2_instance_type,
+      subnet_selection=aws_ec2.SubnetSelection(subnet_type=aws_ec2.SubnetType.PUBLIC),
+      security_group=sg_bastion_host
+    )
+
+    #TODO: SHOULD restrict IP range allowed to ssh acces
+    bastion_host.allow_ssh_access_from(aws_ec2.Peer.ipv4("0.0.0.0/0"))
 
     sg_use_es = aws_ec2.SecurityGroup(self, "ImageTagSearchClientSG",
       vpc=vpc,
@@ -294,6 +322,7 @@ class ImageInsightsStack(core.Stack):
 
     sg_es.add_ingress_rule(peer=sg_es, connection=aws_ec2.Port.all_tcp(), description='image-tagger-es')
     sg_es.add_ingress_rule(peer=sg_use_es, connection=aws_ec2.Port.all_tcp(), description='use-image-tagger-es')
+    sg_es.add_ingress_rule(peer=sg_bastion_host, connection=aws_ec2.Port.all_tcp(), description='image-insights-bastion-host-sg')
 
     #XXX: aws cdk elastsearch example - https://github.com/aws/aws-cdk/issues/2873
     es_cfn_domain = aws_elasticsearch.CfnDomain(self, 'ImageTagSearch',
@@ -311,7 +340,7 @@ class ImageInsightsStack(core.Stack):
         "volumeType": "gp2"
       },
       domain_name="image-insights",
-      elasticsearch_version="7.1",
+      elasticsearch_version="7.4",
       encryption_at_rest_options={
         "enabled": False
       },
@@ -386,4 +415,3 @@ class ImageInsightsStack(core.Stack):
       log_group_name="/aws/lambda/AutomaticImageTagger",
       retention=aws_logs.RetentionDays.THREE_DAYS)
     log_group.grant_write(auto_img_tagger_lambda_fn)
-

@@ -50,8 +50,8 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     ```shell script
     $ cat ~/.aws/config
     [profile cdk_user]
-    aws_access_key_id=AKIAI44QH8DHBEXAMPLE
-    aws_secret_access_key=je7MtGbClwBF/2Zp9Utk/h3yCo8nvbEXAMPLEKEY
+    aws_access_key_id=AKIAIOSFODNN7EXAMPLE
+    aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
     region=us-east-1
     ```
 
@@ -64,8 +64,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     2019-10-25 08:40:28    1294387 es-lib.zip
     ```
 
-3. 소스 코드를 git에서 다운로드 받은 후, `S3_BUCKET_LAMBDA_LAYER_LIB` 라는 환경 변수에 lambda layer에 등록할 패키지가 저장된 s3 bucket 이름을
-설정 한 후, `cdk deploy` 명령어를 이용해서 배포함
+3. 소스 코드를 git에서 다운로드 받은 후, 아래와 같이 cdk 배포 환경을 구축함
 
     ```shell script
     $ git clone https://github.com/ksmin23/image-insights.git
@@ -73,15 +72,29 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     $ python3 -m venv .env
     $ source .env/bin/activate
     (.env) $ pip install -r requirements.txt
-    (.env) $ S3_BUCKET_LAMBDA_LAYER_LIB=image-insights-resources cdk --profile cdk_user deploy
     ```
 
-4. 배포한 애플리케이션을 삭제하려면, `cdk destroy` 명령어를 아래와 같이 실행
+4. `cdk.context.json` 파일을 열어서, `lib_bucket_name`에 Lambda Layer에 등록할 Python 패키지가 저장된 s3 bucket 이름을 적고,<br/>`image_bucket_name_suffix`에 업로드 된 이미지를
+저장하는 s3 bucket의 suffix를 넣는다..<br/>
+
+    ```json
+    {
+      "image_bucket_name_suffix": "Your-S3-Bucket-Name-Suffix",
+      "lib_bucket_name": "Your-S3-Bucket-Name-Of-Lib"
+    }
+    ```
+
+5. `cdk deploy` 명령어를 이용해서 배포한다.
+    ```shell script
+    (.env) $ cdk --profile=cdk_user deploy
+    ```
+
+6. 배포한 애플리케이션을 삭제하려면, `cdk destroy` 명령어를 아래와 같이 실행
     ```shell script
     (.env) $ cdk --profile cdk_user destroy
     ```
 
-5. (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 ec2 인스턴스를 생성함.
+7. (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 ec2 인스턴스를 생성함.
 ec2 인스턴스를 생성 할 때, (1)외부에서 ssh로 접근을 허용하는 security group과 (2)ElasticSearch cluster에 접근할 수 있는 security group으로
 ec2 인스턴스의 security group을 설정함
 
@@ -127,24 +140,37 @@ ec2 인스턴스의 security group을 설정함
 
   1. 업로드한 명함 이미지를 저장할 s3 bucket의 CORS 설정을 아래 처럼 변경함
         ```
-        <?xml version="1.0" encoding="UTF-8"?>
-        <CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-        <CORSRule>
-            <AllowedOrigin>*</AllowedOrigin>
-            <AllowedMethod>GET</AllowedMethod>
-            <MaxAgeSeconds>3000</MaxAgeSeconds>
-            <AllowedHeader>Authorization</AllowedHeader>
-        </CORSRule>
-        <CORSRule>
-            <AllowedOrigin>*</AllowedOrigin>
-            <AllowedMethod>POST</AllowedMethod>
-            <MaxAgeSeconds>3000</MaxAgeSeconds>
-            <AllowedHeader>Authorization</AllowedHeader>
-        </CORSRule>
-        </CORSConfiguration>
+        [
+            {
+                "AllowedHeaders": [
+                    "Authorization"
+                ],
+                "AllowedMethods": [
+                    "GET"
+                ],
+                "AllowedOrigins": [
+                    "*"
+                ],
+                "ExposeHeaders": [],
+                "MaxAgeSeconds": 3000
+            },
+            {
+                "AllowedHeaders": [
+                    "Authorization"
+                ],
+                "AllowedMethods": [
+                    "POST"
+                ],
+                "AllowedOrigins": [
+                    "*"
+                ],
+                "ExposeHeaders": [],
+                "MaxAgeSeconds": 3000
+            }
+        ]
         ```
         - ex)
-           ![s3_bucket_cors_configuration](resources/s3_bucket_cors_configuration.png)
+           ![s3_bucket_cors_configuration](resources/s3_bucket_cors_configuration_json.png)
    2. https://github.com/ksmin23/s3-direct-uploader-demo 를 로컬 PC에 git clone 한 후, 설정을 변경해줘야 할 부분을 알맞게 수정함
    3. 수정한 이후, index.html 파일을 browser로 열어서 사용함
 
