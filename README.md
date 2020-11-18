@@ -186,7 +186,7 @@ ec2 인스턴스의 security group을 설정함
 
    2. https://github.com/ksmin23/s3-direct-uploader-demo 를 로컬 PC에 git clone 한 후, `app.js` 파일에서 `//TODO` 부분을 알맞게 수정함
 
-    ```js
+        ```js
         var uploader = new qq.s3.FineUploader({
             debug: false, // defaults to false
             element: document.getElementById('fine-uploader'),
