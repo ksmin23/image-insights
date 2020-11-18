@@ -27,7 +27,7 @@ class ImageInsightsStack(core.Stack):
 
     # The code that defines your stack goes here
     vpc = aws_ec2.Vpc(self, "ImageInsightsVPC",
-      # cidr="10.0.0.0/21",
+      # cidr="10.31.0.0/21",
       max_azs=2,
       # subnet_configuration=[{
       #     "cidrMask": 24,
@@ -59,9 +59,9 @@ class ImageInsightsStack(core.Stack):
 
     api = apigw.RestApi(self, "ImageAutoTaggerUploader",
       rest_api_name="ImageAutoTaggerUploader",
-      description="This service serves uploading bizcard images into s3.",
+      description="This service serves uploading images into s3.",
       endpoint_types=[apigw.EndpointType.REGIONAL],
-      binary_media_types=["image/png", "image/jpg"],
+      binary_media_types=["image/png", "image/jpg", "image/jpeg"],
       deploy=True,
       deploy_options=apigw.StageOptions(stage_name="v1")
     )
