@@ -27,7 +27,7 @@ class ImageInsightsStack(core.Stack):
 
     # The code that defines your stack goes here
     vpc = aws_ec2.Vpc(self, "ImageInsightsVPC",
-      # cidr="10.31.0.0/21",
+      cidr="10.31.0.0/21",
       max_azs=2,
       # subnet_configuration=[{
       #     "cidrMask": 24,
@@ -56,6 +56,31 @@ class ImageInsightsStack(core.Stack):
     s3_image_bucket_name_suffix = self.node.try_get_context('image_bucket_name_suffix')
     s3_bucket = s3.Bucket(self, "s3bucket",
       bucket_name="image-insights-{region}-{suffix}".format(region=core.Aws.REGION, suffix=s3_image_bucket_name_suffix))
+
+    s3_bucket.add_cors_rule(allowed_methods=[s3.HttpMethods.GET, s3.HttpMethods.POST],
+      allowed_origins=['*'],
+      allowed_headers=['Authorization'],
+      max_age=3000
+    )
+
+    s3_access_key_id = self.node.try_get_context('s3_access_key_id')
+    s3_secret_key = self.node.try_get_context('s3_secret_key')
+    sign_s3_post_lambda_fn = _lambda.Function(self, "SignS3Post",
+      runtime=_lambda.Runtime.PYTHON_3_7,
+      function_name="SignS3Post",
+      handler="sign_s3_post.lambda_handler",
+      description="Return Signature4 for S3",
+      code=_lambda.Code.asset("./src/main/python/SignS3Post"),
+      environment={
+        'ACCESS_KEY': s3_access_key_id,
+        'SECRET_KEY': s3_secret_key
+      },
+      timeout=core.Duration.minutes(5)
+    )
+    log_group = aws_logs.LogGroup(self, "SignS3PostLogGroup",
+      log_group_name="/aws/lambda/SignS3Post",
+      retention=aws_logs.RetentionDays.THREE_DAYS)
+    log_group.grant_write(sign_s3_post_lambda_fn)
 
     api = apigw.RestApi(self, "ImageAutoTaggerUploader",
       rest_api_name="ImageAutoTaggerUploader",
@@ -119,6 +144,33 @@ class ImageInsightsStack(core.Stack):
         'method.request.header.Content-Type': False
       }
     )
+
+    post_s3_lambda_integration = apigw.LambdaIntegration(sign_s3_post_lambda_fn,
+     proxy=False,
+     integration_responses=[{
+       'statusCode': '200',
+       'responseParameters': {
+         'method.response.header.Access-Control-Allow-Origin': "'*'",
+       }
+     }]
+    )
+
+    api.root.add_method('POST',
+      post_s3_lambda_integration,
+      method_responses=[apigw.MethodResponse(status_code="200",
+          response_parameters={
+            'method.response.header.Content-Type': False,
+            'method.response.header.Access-Control-Allow-Origin': True
+          },
+          response_models={
+            'application/json': apigw.EmptyModel()
+          }
+        ),
+        apigw.MethodResponse(status_code="400"),
+        apigw.MethodResponse(status_code="500")
+      ],
+    )
+    self.add_cors_options(api.root)
 
     get_s3_folder_integration_options = apigw.IntegrationOptions(
       credentials_role=rest_api_role,
@@ -415,3 +467,33 @@ class ImageInsightsStack(core.Stack):
       log_group_name="/aws/lambda/AutomaticImageTagger",
       retention=aws_logs.RetentionDays.THREE_DAYS)
     log_group.grant_write(auto_img_tagger_lambda_fn)
+
+
+  def add_cors_options(self, apigw_resource):
+    apigw_resource.add_method('OPTIONS', apigw.MockIntegration(
+        integration_responses=[{
+          'statusCode': '200',
+          'responseParameters': {
+            # 'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+            'method.response.header.Access-Control-Allow-Headers': "'*'",
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+            'method.response.header.Access-Control-Allow-Methods': "'GET,POST,OPTIONS'"
+          }
+        }],
+        passthrough_behavior=apigw.PassthroughBehavior.WHEN_NO_MATCH,
+        request_templates={"application/json":"{\"statusCode\":200}"}
+      ),
+      method_responses=[apigw.MethodResponse(status_code="200",
+        response_parameters={
+          'method.response.header.Content-Type': False,
+          'method.response.header.Access-Control-Allow-Headers': True,
+          'method.response.header.Access-Control-Allow-Methods': True,
+          'method.response.header.Access-Control-Allow-Origin': True,
+        },
+        response_models={
+            'application/json': apigw.EmptyModel()
+        }),
+        apigw.MethodResponse(status_code="400"),
+        apigw.MethodResponse(status_code="500")
+      ]
+   )
