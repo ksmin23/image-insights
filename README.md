@@ -45,7 +45,7 @@
 ### How To Build & Deploy
 1. [Getting Started With the AWS CDK](https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html)를 참고해서 cdk를 설치하고,
 cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등록함
-예를 들어서, cdk_user라는 IAM User를 생성 한 후, 아래와 같이 `~/.aws/config`에 추가로 등록함
+예를 들어서, **cdk_user**라는 IAM User를 생성 한 후, 아래와 같이 `~/.aws/config`에 추가로 등록함
 
     ```shell script
     $ cat ~/.aws/config
@@ -54,6 +54,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     aws_secret_access_key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
     region=us-east-1
     ```
+    :information_source: **cdk_user** 는 임시로 `AdministratorAccess` 권한을 부여한다.
 
 2. Lambda Layer에 등록할 Python 패키지를 생성해서 s3 bucket에 저장함
 에를 들어, elasticsearch 패키지를 Lambda Layer에 등록 할 수 있도록 image-insights-resources라는 이름의 s3 bucket을 생성 후, 아래와 같이 저장함
@@ -74,31 +75,54 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     (.env) $ pip install -r requirements.txt
     ```
 
-4. `cdk.context.json` 파일을 열어서, `lib_bucket_name`에 Lambda Layer에 등록할 Python 패키지가 저장된 s3 bucket 이름을 적고,<br/>`image_bucket_name_suffix`에 업로드 된 이미지를
-저장하는 s3 bucket의 suffix를 넣는다..<br/>
+4. 아래와 같이 S3에 Read/Write를 할 수 있는 권한을 갖는 IAM User를 생성한 후, Access Key Id와 Secrect Key를 다운로드 받음
+   
+   ```json
+   {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject*",
+                "s3:ListObject*",
+                "s3:PutObject",
+                "s3:PutObjectAcl"
+            ],
+            "Resource": "*"
+        }
+    ]
+   }
+   ```
+
+5. `cdk.context.json` 파일을 열어서, `lib_bucket_name`에 Lambda Layer에 등록할 Python 패키지가 저장된 s3 bucket 이름을 적고,<br/>`image_bucket_name_suffix`에 업로드 된 이미지를
+저장하는 s3 bucket의 suffix를 넣는다.<br/>
 
     ```json
     {
       "image_bucket_name_suffix": "Your-S3-Bucket-Name-Suffix",
-      "lib_bucket_name": "Your-S3-Bucket-Name-Of-Lib"
+      "lib_bucket_name": "Your-S3-Bucket-Name-Of-Lib",
+      "s3_access_key_id": "Access-Key-Of-Your-IAM-User-Allowed-To-Access-S3",
+      "s3_secret_key": "Secret-Key-Of-Your-IAM-User-Allowed-To-Access-S3"
     }
     ```
 
-5. `cdk deploy` 명령어를 이용해서 배포한다.
+6. `cdk deploy` 명령어를 이용해서 배포한다.
     ```shell script
     (.env) $ cdk --profile=cdk_user deploy
     ```
 
-6. 배포한 애플리케이션을 삭제하려면, `cdk destroy` 명령어를 아래와 같이 실행
+7. 배포한 애플리케이션을 삭제하려면, `cdk destroy` 명령어를 아래와 같이 실행
     ```shell script
     (.env) $ cdk --profile cdk_user destroy
     ```
 
-7. (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 ec2 인스턴스를 생성함.
+8. (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 ec2 인스턴스를 생성함.
 ec2 인스턴스를 생성 할 때, (1)외부에서 ssh로 접근을 허용하는 security group과 (2)ElasticSearch cluster에 접근할 수 있는 security group으로
 ec2 인스턴스의 security group을 설정함
 
-6. (Optional) local 컴퓨터의 ssh config file에 아래 내용을 추가함 (~/.ssh/config on Mac, Linux)
+9. (Optional) local 컴퓨터의 ssh config file에 아래 내용을 추가함 (~/.ssh/config on Mac, Linux)
     ```shell script
     # Elasticsearch Tunnel
     Host estunnel
@@ -109,9 +133,9 @@ ec2 인스턴스의 security group을 설정함
       LocalForward 9200 vpc-YOUR-ES-CLUSTER.us-east-1.es.amazonaws.com:443 # your ElasticSearch cluster endpoint
     ```
 
-7. (Optional) local 컴퓨터에서 `ssh -N estunnel` 명령어를 실행함
+10. (Optional) local 컴퓨터에서 `ssh -N estunnel` 명령어를 실행함
 
-8. (Optional) local 컴퓨터의 web browser (Chrome, Firefox 등)에서 아래 URL로 접속하면, ElasticSearch와 Kibana에 접근 할 수 있음
+11. (Optional) local 컴퓨터의 web browser (Chrome, Firefox 등)에서 아래 URL로 접속하면, ElasticSearch와 Kibana에 접근 할 수 있음
     - Search: `https://localhost:9200/`
     - Kibana: `https://localhost:9200/_plugin/kibana/`
 
@@ -146,19 +170,7 @@ ec2 인스턴스의 security group을 설정함
                     "Authorization"
                 ],
                 "AllowedMethods": [
-                    "GET"
-                ],
-                "AllowedOrigins": [
-                    "*"
-                ],
-                "ExposeHeaders": [],
-                "MaxAgeSeconds": 3000
-            },
-            {
-                "AllowedHeaders": [
-                    "Authorization"
-                ],
-                "AllowedMethods": [
+                    "GET",
                     "POST"
                 ],
                 "AllowedOrigins": [
@@ -171,6 +183,39 @@ ec2 인스턴스의 security group을 설정함
         ```
         - ex)
            ![s3_bucket_cors_configuration](resources/s3_bucket_cors_configuration_json.png)
-   2. https://github.com/ksmin23/s3-direct-uploader-demo 를 로컬 PC에 git clone 한 후, 설정을 변경해줘야 할 부분을 알맞게 수정함
-   3. 수정한 이후, index.html 파일을 browser로 열어서 사용함
 
+   2. https://github.com/ksmin23/s3-direct-uploader-demo 를 로컬 PC에 git clone 한 후, `app.js` 파일에서 `//TODO` 부분을 알맞게 수정함
+
+    ```js
+        var uploader = new qq.s3.FineUploader({
+            debug: false, // defaults to false
+            element: document.getElementById('fine-uploader'),
+            request: {
+                //TODO: S3 Bucket URL
+                endpoint: 'https://{s3-bucket-name}.s3.amazonaws.com',
+                //TODO: IAM User AccessKey
+                accessKey: '{IAM User AccessKey}'
+            },
+            objectProperties: {
+                //TODO: AWS Region name
+                region: '{region-name}',
+                key(fileId) {
+                    //TODO: S3 Bucket Prefix
+                    var prefixPath = '{s3-bucket-prefix}'
+                    var filename = this.getName(fileId)
+                    return prefixPath + '/' + filename
+                }
+            },
+            signature: {
+                // version
+                version: 4,
+                //TODO: AWS API Gateway Lambda Authorizers URL
+                endpoint: 'https://{api-gateway-id}.execute-api.{region-name}.amazonaws.com/{api-gateway-version}'
+            },
+            retry: {
+                enableAuto: true // defaults to false
+            }
+        });
+        ```
+
+   3. 수정한 이후, `index.html` 파일을 browser로 열어서 사용함
