@@ -118,11 +118,15 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     (.env) $ cdk --profile cdk_user destroy
     ```
 
-8. (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 ec2 인스턴스를 생성함.
+8. 배포가 완료되면, API Gateway 웹 콘솔 접속해서 이미지 Uploader API의 **Binary Media Types** 설정이
+   정상적으로 되어 있는지 확인함
+   ![apigw-binary-media-types-setting](resources/apigw-binary-media-types-setting.png)
+
+9.  (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 ec2 인스턴스를 생성함.
 ec2 인스턴스를 생성 할 때, (1)외부에서 ssh로 접근을 허용하는 security group과 (2)ElasticSearch cluster에 접근할 수 있는 security group으로
 ec2 인스턴스의 security group을 설정함
 
-9. (Optional) local 컴퓨터의 ssh config file에 아래 내용을 추가함 (~/.ssh/config on Mac, Linux)
+10. (Optional) local 컴퓨터의 ssh config file에 아래 내용을 추가함 (~/.ssh/config on Mac, Linux)
     ```shell script
     # Elasticsearch Tunnel
     Host estunnel
@@ -133,9 +137,9 @@ ec2 인스턴스의 security group을 설정함
       LocalForward 9200 vpc-YOUR-ES-CLUSTER.us-east-1.es.amazonaws.com:443 # your ElasticSearch cluster endpoint
     ```
 
-10. (Optional) local 컴퓨터에서 `ssh -N estunnel` 명령어를 실행함
+11. (Optional) local 컴퓨터에서 `ssh -N estunnel` 명령어를 실행함
 
-11. (Optional) local 컴퓨터의 web browser (Chrome, Firefox 등)에서 아래 URL로 접속하면, ElasticSearch와 Kibana에 접근 할 수 있음
+12. (Optional) local 컴퓨터의 web browser (Chrome, Firefox 등)에서 아래 URL로 접속하면, ElasticSearch와 Kibana에 접근 할 수 있음
     - Search: `https://localhost:9200/`
     - Kibana: `https://localhost:9200/_plugin/kibana/`
 
