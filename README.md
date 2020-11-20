@@ -200,7 +200,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
 
 
 ### Kibana dashboards 그리기
-1. 웹 브라우저에서 `https://localhost:9200/_plugin/kibana/` 로 접속함
+1. local 컴퓨터의 web browser (Chrome, Firefox 등)에서 `https://localhost:9200/_plugin/kibana/` 로 접속함
 2. Kibana toolbar에서 Managemant > Index Patterns 메뉴를 선택 해서, Index Pattern을 생성함 (예: image_insights)<br/>
     - (1) ![kibana-index-patterns-01](resources/kibana-index-patterns-01.png)
     - (2) ![kibana-index-patterns-02](resources/kibana-index-patterns-02.png)
