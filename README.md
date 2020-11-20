@@ -154,7 +154,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     MY-KEY.pub
     ```
 
-11. (Optional) local 컴퓨터의 ssh config file에 아래 내용을 추가함 (~/.ssh/config on Mac, Linux)
+11. (Optional) local 컴퓨터의 ssh config file에 아래 내용을 추가함 (`~/.ssh/config` on Mac, Linux)
     ```shell script
     # Elasticsearch Tunnel
     Host estunnel
@@ -180,7 +180,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
         --instance-os-user ec2-user \
         --instance-id ${INSTANCE_ID} \
         --availability-zone ${AVAIL_ZONE} \
-        --ssh-public-key file://{SSH_PUBLIC_KEY}
+        --ssh-public-key file://${SSH_PUBLIC_KEY}
 
     $ bash send_ssh_publick_key.sh
     {
