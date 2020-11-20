@@ -122,24 +122,79 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
    정상적으로 되어 있는지 확인함
    ![apigw-binary-media-types-setting](resources/apigw-binary-media-types-setting.png)
 
-9.  (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 ec2 인스턴스를 생성함.
-ec2 인스턴스를 생성 할 때, (1)외부에서 ssh로 접근을 허용하는 security group과 (2)ElasticSearch cluster에 접근할 수 있는 security group으로
-ec2 인스턴스의 security group을 설정함
+9.  (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 bastion host (ec2 인스턴스)가 생성되었는지 확인함
+    ![ec2-bastion-host-info](resources/ec2-bastion-host-info.png)
 
-10. (Optional) local 컴퓨터의 ssh config file에 아래 내용을 추가함 (~/.ssh/config on Mac, Linux)
+10. (Optional) bastion host에서 사용 할 ssh key를 다음과 같이 생성함
+    ```shell script
+    $ cd ~/.ssh
+    $ ssh-keygen
+    Generating public/private rsa key pair.
+    Enter file in which to save the key (~/.ssh/id_rsa): MY-KEY
+    Enter passphrase (empty for no passphrase):
+    Enter same passphrase again:
+    Your identification has been saved in MY-KEY.
+    Your public key has been saved in MY-KEY.pub.
+    The key fingerprint is:
+    SHA256:NjRiNGM1MzY2NmM5NjY1Yjc5ZDBhNTdmMGU0NzZhZGF
+    The key's randomart image is:
+    +---[RSA 3072]----+
+    |E*B++o           |
+    |B= = ..          |
+    |**o +            |
+    |B=+  o           |
+    |B+=oo . S        |
+    |+@o+ o .         |
+    |*.+o  .          |
+    |.oo              |
+    |  o.             |
+    +----[SHA256]-----+
+    $ ls -1 MY-KEY*
+    MY-KEY
+    MY-KEY.pub
+    ```
+
+11. (Optional) local 컴퓨터의 ssh config file에 아래 내용을 추가함 (~/.ssh/config on Mac, Linux)
     ```shell script
     # Elasticsearch Tunnel
     Host estunnel
       HostName 12.34.56.78 # your server's public IP address
       User ec2-user # your servers' user name
       IdentitiesOnly yes
-      IdentityFile ~/.ssh/MY-KEY.pem # your servers' key pair
+      IdentityFile ~/.ssh/MY-KEY # your servers' key pair
       LocalForward 9200 vpc-YOUR-ES-CLUSTER.us-east-1.es.amazonaws.com:443 # your ElasticSearch cluster endpoint
     ```
 
-11. (Optional) local 컴퓨터에서 `ssh -N estunnel` 명령어를 실행함
+12. (Optional) 다음과 같은 방식으로 ssh로 bastion host에 접근 할 수 있도록, public key를 bastion host에 보냄
+    ```shell script
+    $ cat send_ssh_publick_key.sh
+    #!/bin/bash -
 
-12. (Optional) local 컴퓨터의 web browser (Chrome, Firefox 등)에서 아래 URL로 접속하면, ElasticSearch와 Kibana에 접근 할 수 있음
+    REGION=us-east-1 # Your Region
+    INSTANCE_ID=i-xxxxxxxxxxxxxxxxx # Your Bastion Host Instance Id
+    AVAIL_ZONE=us-east-1a # Your AZ
+    SSH_PUBLIC_KEY=${HOME}/.ssh/MY-KEY.pub # Your SSH Publikc Key location
+
+    aws ec2-instance-connect send-ssh-public-key \
+        --region ${REGION} \
+        --instance-os-user ec2-user \
+        --instance-id ${INSTANCE_ID} \
+        --availability-zone ${AVAIL_ZONE} \
+        --ssh-public-key file://{SSH_PUBLIC_KEY}
+
+    $ bash send_ssh_publick_key.sh
+    {
+        "RequestId": "af8c63b9-90b3-48a9-9cb5-b242ec2c34ad",
+        "Success": true
+    }
+    ```
+
+13. (Optional) local 컴퓨터에서 `ssh -N estunnel` 명령어를 실행함
+    ```shell script
+    $ ssh -N estunnel
+    ```
+
+14. (Optional) local 컴퓨터의 web browser (Chrome, Firefox 등)에서 아래 URL로 접속하면, ElasticSearch와 Kibana에 접근 할 수 있음
     - Search: `https://localhost:9200/`
     - Kibana: `https://localhost:9200/_plugin/kibana/`
 
