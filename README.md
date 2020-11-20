@@ -144,10 +144,34 @@ ec2 인스턴스의 security group을 설정함
     - Kibana: `https://localhost:9200/_plugin/kibana/`
 
 
-### Kibana dashboards 가져오기 (Elasticsearch version 7.1.1)
-1. Kibana toolbar에서 Management > Saved Objets 탭 선택함
-2. Import button 클릭 후에 가져올 dashboards json 파일(```resources/es-kibana/kibana-export.json```)을 선택함
-3. Dashboards 탭을 열어서 가져온 dashboard른 선택해서 dashboard를 사용하면 됨
+### Kibana dashboards 그리기
+1. 웹 브라우저에서 `https://localhost:9200/_plugin/kibana/` 로 접속함
+2. Kibana toolbar에서 Managemant > Index Patterns 메뉴를 선택 해서, Index Pattern을 생성함 (예: image_insights)
+    (1) ![kibana-index-patterns-01](resources/kibana-index-patterns-01.png)
+    (2) ![kibana-index-patterns-02](resources/kibana-index-patterns-02.png)
+3. Kibana toolbar에서 Visualize 메뉴를 선택 함 (다음 순서로 그래프를 그림)
+    (a) Image Count 그리기
+    (1) ![kibana-visualize-01](resources/kibana-visualize-01.png)
+    (2) ![kibana-visualize-img-count-02](resources/kibana-visualize-img-count-02.png)
+    (3) ![kibana-visualize-img-count-03](resources/ kibana-visualize-img-count-03.png)
+    (4) ![kibana-visualize-img-count-04](resources/kibana-visualize-img-count-04.png)
+    (b) Tage Cloud 그리기
+    (1) ![kibana-visualize-tag-cloud-01](resources/kibana-visualize-tag-cloud-01.png)
+    (2) ![kibana-visualize-tag-cloud-02](resources/kibana-visualize-tag-cloud-02.png)
+    (3) ![kibana-visualize-tag-cloud-03](resources/kibana-visualize-tag-cloud-03.png)
+    (c) Tage Count 그리기
+    (1) ![kibana-visualize-tag-count-01](resources/kibana-visualize-tag-count-01.png)
+    (2) ![kibana-visualize-tag-count-02](resources/kibana-visualize-tag-count-02.png)
+    (3) ![kibana-visualize-tag-count-03](resources/kibana-visualize-tag-count-03.png)
+    (d) Tage Pie Chart 그리기
+    (1) ![kibana-visualize-tag-pie-chart-01](resources/kibana-visualize-tag-pie-chart-01.png)
+    (2) ![kibana-visualize-tag-pie-chart-02](resources/kibana-visualize-tag-pie-chart-02.png)
+    (3) ![kibana-visualize-tag-pie-chart-03](resources/kibana-visualize-tag-pie-chart-03.png)
+4. Kibana toolbar에서 Dashboard 메뉴를 선택 함 (다음 순서로 Dashboard에 앞서 생성한 그래프를 추가함)
+    (1) ![kibana-dashboard-01](resources/kibana-dashboard-01.png)
+    (2) ![kibana-dashboard-02](resources/kibana-dashboard-02.png)
+    (3) ![kibana-dashboard-03](resources/kibana-dashboard-03.png)
+
 
 ### Demo
 ##### 이미지를 등록하는 방법
