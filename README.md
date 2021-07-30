@@ -212,12 +212,12 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     - (3) ![kibana-visualize-img-count-03](resources/kibana-visualize-img-count-03.png)
     - (4) ![kibana-visualize-img-count-04](resources/kibana-visualize-img-count-04.png)
 
-    (b) Tage Cloud 그리기
+    (b) Tag Cloud 그리기
     - (1) ![kibana-visualize-tag-cloud-01](resources/kibana-visualize-tag-cloud-01.png)
     - (2) ![kibana-visualize-tag-cloud-02](resources/kibana-visualize-tag-cloud-02.png)
     - (3) ![kibana-visualize-tag-cloud-03](resources/kibana-visualize-tag-cloud-03.png)
 
-    (c) Tage Count 그리기
+    (c) Tag Count 그리기
     - (1) ![kibana-visualize-tag-count-01](resources/kibana-visualize-tag-count-01.png)
     - (2) ![kibana-visualize-tag-count-02](resources/kibana-visualize-tag-count-02.png)
     - (3) ![kibana-visualize-tag-count-03](resources/kibana-visualize-tag-count-03.png)
