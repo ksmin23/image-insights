@@ -222,7 +222,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     - (2) ![kibana-visualize-tag-count-02](resources/kibana-visualize-tag-count-02.png)
     - (3) ![kibana-visualize-tag-count-03](resources/kibana-visualize-tag-count-03.png)
 
-    (d) Tage Pie Chart 그리기<br/>
+    (d) Tag Pie Chart 그리기<br/>
     - (1) ![kibana-visualize-tag-pie-chart-01](resources/kibana-visualize-tag-pie-chart-01.png)
     - (2) ![kibana-visualize-tag-pie-chart-02](resources/kibana-visualize-tag-pie-chart-02.png)
     - (3) ![kibana-visualize-tag-pie-chart-03](resources/kibana-visualize-tag-pie-chart-03.png)
