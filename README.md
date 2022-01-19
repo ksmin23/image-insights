@@ -2,9 +2,9 @@
 
 - Amazon Rekognition을 활용한 이미지 자동 태킹 및 이미지 태그 데이터 시각화 서비스
 - (1) 아래와 같이 이미지를 업로드 하면,
-![demo_upload_image_files](resources/demo-upload-image-files.png)
+![demo_upload_image_files](assets/demo-upload-image-files.png)
 - (2) 다음과 같이 이미지 태그 데이터의 분석 결과를 보여준다.
-![demo_image_tags_visualization](resources/demo-image-tags-visualization.png)
+![demo_image_tags_visualization](assets/demo-image-tags-visualization.png)
 
 
 ### Architecture
@@ -120,10 +120,10 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
 
 8. 배포가 완료되면, API Gateway 웹 콘솔 접속해서 이미지 Uploader API의 **Binary Media Types** 설정이
    정상적으로 되어 있는지 확인함
-   ![apigw-binary-media-types-setting](resources/apigw-binary-media-types-setting.png)
+   ![apigw-binary-media-types-setting](assets/apigw-binary-media-types-setting.png)
 
 9.  (Optional) VPC내에 생성된 ElasticSearch cluster에 ssh tunnel을 이용해서 접근할 수 있도록 위에서 생성한 VPC의 public subnet에 bastion host (ec2 인스턴스)가 생성되었는지 확인함
-    ![ec2-bastion-host-info](resources/ec2-bastion-host-info.png)
+    ![ec2-bastion-host-info](assets/ec2-bastion-host-info.png)
 
 10. (Optional) bastion host에서 사용 할 ssh key를 다음과 같이 생성함
     ```shell script
@@ -202,35 +202,35 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
 ### Kibana dashboards 그리기
 1. local 컴퓨터의 web browser (Chrome, Firefox 등)에서 `https://localhost:9200/_plugin/kibana/` 로 접속함
 2. Kibana toolbar에서 Managemant > Index Patterns 메뉴를 선택 해서, Index Pattern을 생성함 (예: image_insights)<br/>
-    - (1) ![kibana-index-patterns-01](resources/kibana-index-patterns-01.png)
-    - (2) ![kibana-index-patterns-02](resources/kibana-index-patterns-02.png)
+    - (1) ![kibana-index-patterns-01](assets/kibana-index-patterns-01.png)
+    - (2) ![kibana-index-patterns-02](assets/kibana-index-patterns-02.png)
 
 3. Kibana toolbar에서 Visualize 메뉴를 선택 함 (다음 순서로 그래프를 그림)<br/>
     (a) Image Count 그리기
-    - (1) ![kibana-visualize-01](resources/kibana-visualize-01.png)
-    - (2) ![kibana-visualize-img-count-02](resources/kibana-visualize-img-count-02.png)
-    - (3) ![kibana-visualize-img-count-03](resources/kibana-visualize-img-count-03.png)
-    - (4) ![kibana-visualize-img-count-04](resources/kibana-visualize-img-count-04.png)
+    - (1) ![kibana-visualize-01](assets/kibana-visualize-01.png)
+    - (2) ![kibana-visualize-img-count-02](assets/kibana-visualize-img-count-02.png)
+    - (3) ![kibana-visualize-img-count-03](assets/kibana-visualize-img-count-03.png)
+    - (4) ![kibana-visualize-img-count-04](assets/kibana-visualize-img-count-04.png)
 
     (b) Tag Cloud 그리기
-    - (1) ![kibana-visualize-tag-cloud-01](resources/kibana-visualize-tag-cloud-01.png)
-    - (2) ![kibana-visualize-tag-cloud-02](resources/kibana-visualize-tag-cloud-02.png)
-    - (3) ![kibana-visualize-tag-cloud-03](resources/kibana-visualize-tag-cloud-03.png)
+    - (1) ![kibana-visualize-tag-cloud-01](assets/kibana-visualize-tag-cloud-01.png)
+    - (2) ![kibana-visualize-tag-cloud-02](assets/kibana-visualize-tag-cloud-02.png)
+    - (3) ![kibana-visualize-tag-cloud-03](assets/kibana-visualize-tag-cloud-03.png)
 
     (c) Tag Count 그리기
-    - (1) ![kibana-visualize-tag-count-01](resources/kibana-visualize-tag-count-01.png)
-    - (2) ![kibana-visualize-tag-count-02](resources/kibana-visualize-tag-count-02.png)
-    - (3) ![kibana-visualize-tag-count-03](resources/kibana-visualize-tag-count-03.png)
+    - (1) ![kibana-visualize-tag-count-01](assets/kibana-visualize-tag-count-01.png)
+    - (2) ![kibana-visualize-tag-count-02](assets/kibana-visualize-tag-count-02.png)
+    - (3) ![kibana-visualize-tag-count-03](assets/kibana-visualize-tag-count-03.png)
 
     (d) Tag Pie Chart 그리기<br/>
-    - (1) ![kibana-visualize-tag-pie-chart-01](resources/kibana-visualize-tag-pie-chart-01.png)
-    - (2) ![kibana-visualize-tag-pie-chart-02](resources/kibana-visualize-tag-pie-chart-02.png)
-    - (3) ![kibana-visualize-tag-pie-chart-03](resources/kibana-visualize-tag-pie-chart-03.png)
+    - (1) ![kibana-visualize-tag-pie-chart-01](assets/kibana-visualize-tag-pie-chart-01.png)
+    - (2) ![kibana-visualize-tag-pie-chart-02](assets/kibana-visualize-tag-pie-chart-02.png)
+    - (3) ![kibana-visualize-tag-pie-chart-03](assets/kibana-visualize-tag-pie-chart-03.png)
 
 4. Kibana toolbar에서 Dashboard 메뉴를 선택 함 (다음 순서로 Dashboard에 앞서 생성한 그래프를 추가함)<br/>
-    - (1) ![kibana-dashboard-01](resources/kibana-dashboard-01.png)
-    - (2) ![kibana-dashboard-02](resources/kibana-dashboard-02.png)
-    - (3) ![kibana-dashboard-03](resources/kibana-dashboard-03.png)
+    - (1) ![kibana-dashboard-01](assets/kibana-dashboard-01.png)
+    - (2) ![kibana-dashboard-02](assets/kibana-dashboard-02.png)
+    - (3) ![kibana-dashboard-03](assets/kibana-dashboard-03.png)
 
 
 ### Demo
@@ -240,13 +240,13 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
 
   1. Postman에서 아래 그림과 같이 Authorization 탭에서 TYPE을 AWS Signature로 선택하고, S3 Read/Write 권한을 가진 사용자의 
  AccessKey, SecretKey를 등록하고, AWS Region을 설정함<br/>
-  ![img-uploader-01](resources/img-uploader-01.png)
+  ![img-uploader-01](assets/img-uploader-01.png)
   2. Headers 탭을 선택하고, Key, Value를 아래 그림과 같이 추가함<br/>
-  ![img-uploader-02](resources/img-uploader-02.png)
+  ![img-uploader-02](assets/img-uploader-02.png)
   3. Body 탭에서 binary를 선택하고, Select File 버튼을 눌러서, 전송할 파일을 추가함<br/>
-  ![img-uploader-02](resources/img-uploader-03.png)
+  ![img-uploader-02](assets/img-uploader-03.png)
   4. 전송할 이미지 파일이 추가한 후, Send 버튼을 눌러서 PUT 메소드를 실행함<br/>
-  ![img-uploader-02](resources/img-uploader-04.png)
+  ![img-uploader-02](assets/img-uploader-04.png)
 
 - **demo용 클라이언트를 사용하는 방법**
 
@@ -270,7 +270,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
         ]
         ```
         - ex)
-           ![s3_bucket_cors_configuration](resources/s3_bucket_cors_configuration_json.png)
+           ![s3_bucket_cors_configuration](assets/s3_bucket_cors_configuration_json.png)
 
    2. [Serverless S3 Upload with Lambda Demo](https://github.com/Beomi/s3-direct-uploader-demo) 를 로컬 PC에 git clone 한 후, `app.js` 파일에서 `//TODO` 부분을 알맞게 수정함
 
