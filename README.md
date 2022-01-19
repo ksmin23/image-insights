@@ -56,8 +56,23 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
     ```
     :information_source: **cdk_user** 는 임시로 `AdministratorAccess` 권한을 부여한다.
 
-2. Lambda Layer에 등록할 Python 패키지를 생성해서 s3 bucket에 저장함
-에를 들어, elasticsearch 패키지를 Lambda Layer에 등록 할 수 있도록 image-insights-resources라는 이름의 s3 bucket을 생성 후, 아래와 같이 저장함
+2. Lambda Layer에 등록할 Python 패키지를 생성해서 s3 bucket에 저장함<br/>
+   예를 들어, Lambda Layer에 등록할 elasticsearch 패키지를 아래와 같은 방식으로 생함
+
+    ```shell script
+    $ python3 -m venv es-lib # virtual environments을 생성함
+    $ cd es-lib
+    $ source bin/activate
+    (es-lib) $ mkdir -p python_modules # 필요한 패키지를 저장할 디렉터리 생성
+    (es-lib) $ pip install 'elasticsearch < 7.14' requests requests-aws4auth -t python_modules # 필요한 패키지를 사용자가 지정한 패키지 디렉터리에 저장함
+    (es-lib) $ mv python_modules python # 사용자가 지정한 패키지 디렉터리 이름을 python으로 변경함 (python 디렉터리에 패키지를 설치할 경우 에러가 나기 때문에 다른 이름의 디렉터리에 패키지를 설치 후, 디렉터리 이름을 변경함)
+    (es-lib) $ zip -r es-lib.zip python/ # 필요한 패키지가 설치된 디렉터리를 압축함
+    (es-lib) $ aws s3 mb s3://my-bucket-for-lambda-layer-packages # 압축한 패키지를 업로드할 s3 bucket을 생성함
+    (es-lib) $ aws s3 cp es-lib.zip s3://my-bucket-for-lambda-layer-packages/python/ # 압축한 패키지를 s3에 업로드 한 후, lambda layer에 패키지를 등록할 때, s3 위치를 등록하면 됨
+    (es-lib) $ deactivate
+    ```
+
+    elasticsearch 패키지를 Lambda Layer에 등록 할 수 있도록 image-insights-resources라는 이름의 s3 bucket을 생성 후, 아래와 같이 저장함
 
     ```shell script
     $ aws s3 ls s3://image-insights-resources/var/
@@ -68,7 +83,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
 3. 소스 코드를 git에서 다운로드 받은 후, 아래와 같이 cdk 배포 환경을 구축함
 
     ```shell script
-    $ git clone https://github.com/ksmin23/image-insights.git
+    $ git clone https://github.com/aws-samples/image-insights.git
     $ cd image-insights
     $ python3 -m venv .env
     $ source .env/bin/activate
