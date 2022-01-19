@@ -272,7 +272,7 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
         - ex)
            ![s3_bucket_cors_configuration](resources/s3_bucket_cors_configuration_json.png)
 
-   2. https://github.com/ksmin23/s3-direct-uploader-demo 를 로컬 PC에 git clone 한 후, `app.js` 파일에서 `//TODO` 부분을 알맞게 수정함
+   2. [Serverless S3 Upload with Lambda Demo](https://github.com/Beomi/s3-direct-uploader-demo) 를 로컬 PC에 git clone 한 후, `app.js` 파일에서 `//TODO` 부분을 알맞게 수정함
 
         ```js
         var uploader = new qq.s3.FineUploader({
