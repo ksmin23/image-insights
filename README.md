@@ -83,8 +83,8 @@ cdk를 실행할 때 사용할 IAM User를 생성한 후, `~/.aws/config`에 등
 3. 소스 코드를 git에서 다운로드 받은 후, 아래와 같이 cdk 배포 환경을 구축함
 
     ```shell script
-    $ git clone https://github.com/aws-samples/image-insights.git
-    $ cd image-insights
+    $ git clone https://github.com/aws-samples/aws-realtime-image-analysis.git
+    $ cd aws-realtime-image-analysis
     $ python3 -m venv .env
     $ source .env/bin/activate
     (.env) $ pip install -r requirements.txt
