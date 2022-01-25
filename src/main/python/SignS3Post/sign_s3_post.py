@@ -4,10 +4,9 @@
 
 #***************************************************************************************/
 #*
-#*  Title: signS3POST.py
-#*  Description: Lambda Function for Signing POST request to S3(Direct Uploads)
 #*  Author: Beomi
 #*  Availability: https://gist.github.com/Beomi/ac9d34dbfa9a6bdaf4a0426e8b83b4e3
+#*  SPDX-License-Identifier: MIT
 #*
 #***************************************************************************************/
 
